@@ -1,0 +1,3 @@
+SecurityIncident
+| where Severity contains "Informational"
+| project TimeGenerated, Title, Severity

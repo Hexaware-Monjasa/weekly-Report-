@@ -1,0 +1,12 @@
+SecurityIncident
+| where Severity !contains "Informational"
+| summarize arg_max(TimeGenerated,*) by IncidentNumber
+| extend Comments = parse_json(Comments)
+| mv-expand Comments
+| extend Comment = parse_json(Comments.message)
+| project IncidentNumber, Severity, Title, CreatedTime, NotfiedTime=FirstModifiedTime, Status, ClassificationComment, Comment
+| union (SecurityIncident
+| where Severity !contains "Informational"
+| summarize arg_max(TimeGenerated,*) by IncidentNumber
+| where Comments == "[]"
+| project IncidentNumber, Severity, Title, CreatedTime, NotfiedTime=FirstModifiedTime, Status, ClassificationComment, Comment=Comments )
